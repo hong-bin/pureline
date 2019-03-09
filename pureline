@@ -1,6 +1,6 @@
 #!/bin/env bash
 
-# PureLine - A Pure Bash Powerline PS1 Command Prompt 
+# PureLine - A Pure Bash Powerline PS1 Command Prompt
 
 # -----------------------------------------------------------------------------
 # returns a string with the powerline symbol for a section end
@@ -77,7 +77,8 @@ function user_module {
         if [ "$PL_USER_USE_IP" = true ]; then
             content+="@$(ip_address)"
         else
-            content+="@\h"
+            #content+="@\h"
+            content+="@Verdigris"
         fi
     fi
     PS1+="$(section_end $fg_color $bg_color)"
@@ -265,6 +266,8 @@ function virtual_env_module {
 function battery_module {
     local bg_color="$1"
     local fg_color="$2"
+    local bg_warn_color="$3"
+    local thres="$4"
     local batt_dir
     local content
     local batt_dir="/sys/class/power_supply/BAT"
@@ -285,9 +288,15 @@ function battery_module {
     fi
     content="$content$cap%"
 
-    PS1+="$(section_end $fg_color $bg_color)"
-    PS1+="$(section_content $fg_color $bg_color " $content ")"
-    __last_color="$bg_color"
+    if [ $cap -lt $thres ]; then
+      PS1+="$(section_end $fg_color $bg_warn_color)"
+      PS1+="$(section_content $fg_color $bg_warn_color " $content ")"
+      __last_color="$bg_warn_color"
+    else
+      PS1+="$(section_end $fg_color $bg_color)"
+      PS1+="$(section_content $fg_color $bg_color " $content ")"
+      __last_color="$bg_color"
+    fi
 }
 
 # -----------------------------------------------------------------------------
@@ -447,7 +456,7 @@ fi
 # grab a snapshot of the systems PROMPT_COMMAND. this can then be
 # appended to pureline when sourced without continually appending
 # pureline to itself.
-if [ -z "$__PROMPT_COMMAND" ]; then 
+if [ -z "$__PROMPT_COMMAND" ]; then
     __PROMPT_COMMAND="$PROMPT_COMMAND"
 fi
 
