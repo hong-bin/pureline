@@ -174,7 +174,9 @@ function read_only_module {
 #   PL_GIT_UNTRACKED: true/false
 function git_module {
     local git_branch=$(git rev-parse --abbrev-ref HEAD 2> /dev/null)
+
     if [ -n "$git_branch" ]; then
+        git_branch=`expr substr $git_branch 1 5`...
         local bg_color="$1"
         local fg_color="$2"
         local content="${PL_SYMBOLS[git_branch]} $git_branch"
@@ -283,6 +285,8 @@ function battery_module {
 
     if [ "$status" == "Discharging" ]; then
         content="${PL_SYMBOLS[battery_discharging]} "
+    elif [[ "$status" == "Unknown" || "$status" == "Full" ]]; then
+        content="${PL_SYMBOLS[battery_plug]} "
     else
         content="${PL_SYMBOLS[battery_charging]}"
     fi
